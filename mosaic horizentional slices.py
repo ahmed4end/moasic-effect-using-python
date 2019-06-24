@@ -4,6 +4,8 @@ import glob
 import os 
 import random
 import time
+#import shelve
+
 
 
 Image.MAX_IMAGE_PIXELS = 100000000  # For PIL Image error when handling very large images
@@ -11,18 +13,12 @@ Image.MAX_IMAGE_PIXELS = 100000000  # For PIL Image error when handling very lar
 ################################### changing case ###############################################
 os.chdir("./data/")
 imgs = glob.glob("*.jpg")
+#d = shelve.open("temp")
 #################################################################################################
 
 
-target =  np.array(Image.open("a.png"))
+target =  np.array(Image.open("target.png"))
 
-
-
-
-def add_order(imgs): # naming the image used in order 1,2,3....(.jpg) only use it once when starting .
-	os.chdir("./data/")
-	for i in range(len(imgs)):
-		os.rename(imgs[i], str(i)+".jpg")
 
 
 
@@ -39,15 +35,25 @@ def dc(filename): # returns the dominant color of an image.
     dominant_color = sorted_pixels[-1][1]
     return dominant_color
 
+################################### Option HERE ##########################################
+
 def find_close(target, dict): #finds the closed rgb  to the rgb target 
 	dict_values = dict.values()
 	randoms = list(map(lambda x: ((target[0] - x[0])**2+(target[1] - x[1])**2+(target[2] - x[2])**2),dict_values))
 	return list(dict.items())[randoms.index(min(randoms))]
 
+def find_closeV2(target, dict): #finds the closed rgb  to the rgb target 
+	dict_values = dict.values()
+	randoms = list(map(lambda x: sum((2+(0.5*(target[0]+x[0])),4,3-(0.5*(target[0]+x[0])))*(np.array(list(target))-x)**2)**0.5,dict_values))
+	return list(dict.items())[randoms.index(min(randoms))]
+##########################################################################################
+
 
 
 ############################### STOP POINT ########################
-dict = {i:dc(i) for i in imgs}
+""" if u used find_close() fuction us the first next line of code and disable the one below it otherwise do the opposite."""
+#dict = {i:dc(i) for i in imgs}
+dict = {i:np.array(list(dc(i))) for i in imgs}
 ###################################################################
 
 
